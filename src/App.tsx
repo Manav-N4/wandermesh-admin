@@ -8,7 +8,7 @@ import LeadCard from './components/LeadCard';
 import { AnimatePresence } from 'framer-motion';
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null); // null means checking session
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -19,8 +19,21 @@ function App() {
   const [tripFilter, setTripFilter] = useState('All');
   const [genderFilter, setGenderFilter] = useState('All');
   
-  // Tracking new lead (demo purposes/highlight newest)
+  // Tracking new lead
   const [lastRefreshedAt, setLastRefreshedAt] = useState<Date>(new Date());
+
+  // 1. Check for initial session
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsAuthenticated(!!session);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsAuthenticated(!!session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const fetchLeads = useCallback(async (isAuto = false) => {
     if (!isAuto) setLoading(true);
@@ -36,10 +49,9 @@ function App() {
         console.error('Error fetching leads:', error);
         setError(`Supabase error: ${error.message}`);
       } else {
-        // Mock status in state since it's frontend-only
         const enrichedLeads = (data || []).map((l: any) => ({
           ...l,
-          status: l.status || 'New' // Fallback to New if not in DB
+          status: l.status || 'New'
         }));
         setLeads(enrichedLeads);
         setError(null);
@@ -55,20 +67,20 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated === true) {
       fetchLeads();
-      
-      // Auto refresh every 30 seconds
-      const interval = setInterval(() => {
-        fetchLeads(true);
-      }, 30000);
-      
+      const interval = setInterval(() => fetchLeads(true), 30000);
       return () => clearInterval(interval);
     }
   }, [isAuthenticated, fetchLeads]);
 
   const handleStatusChange = (id: string, status: LeadStatus) => {
     setLeads(prev => prev.map(l => l.id === id ? { ...l, status } : l));
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setIsAuthenticated(false);
   };
 
   const filteredLeads = useMemo(() => {
@@ -89,7 +101,39 @@ function App() {
     return counts;
   }, [leads]);
 
-  if (!isAuthenticated) {
+  // Loading state while checking session
+  if (isAuthenticated === null) {
+    return (
+      <div className="dashboard-loading-screen">
+        <div className="loader"></div>
+        <p>Verifying session...</p>
+        <style>{`
+          .dashboard-loading-screen {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #f8fafc;
+            color: #64748b;
+            font-weight: 500;
+          }
+          .loader {
+            width: 32px;
+            height: 32px;
+            border: 3px solid #f1f5f9;
+            border-top: 3px solid #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+          }
+          @keyframes spin { to { transform: rotate(360deg); } }
+        `}</style>
+      </div>
+    );
+  }
+
+  if (isAuthenticated === false) {
     return <AuthGate onSuccess={() => setIsAuthenticated(true)} />;
   }
 
@@ -105,12 +149,7 @@ function App() {
           </div>
           <div className="header-actions">
             <span className="last-refresh">Last update: {lastRefreshedAt.toLocaleTimeString()}</span>
-            <button 
-              className="logout-btn"
-              onClick={() => setIsAuthenticated(false)}
-            >
-              Log out
-            </button>
+            <button className="logout-btn" onClick={handleLogout}>Log out</button>
           </div>
         </div>
       </header>
@@ -214,7 +253,6 @@ function App() {
 
         .breadcrumb-divider {
           color: #cbd5e1;
-          font-weight: 300;
         }
 
         .breadcrumb-current {
@@ -246,6 +284,7 @@ function App() {
           border-radius: 8px;
           text-transform: uppercase;
           transition: all 0.2s;
+          cursor: pointer;
         }
 
         .logout-btn:hover {
@@ -283,16 +322,8 @@ function App() {
           background: #fffafa;
         }
 
-        .error-emoji {
-          font-size: 2rem;
-          margin-bottom: 1rem;
-        }
-
-        .error-state p {
-          color: #ef4444;
-          font-weight: 500;
-          margin-top: 8px;
-        }
+        .error-emoji { font-size: 2rem; margin-bottom: 1rem; }
+        .error-state p { color: #ef4444; font-weight: 500; margin-top: 8px; }
 
         .loader {
           width: 32px;
@@ -318,18 +349,11 @@ function App() {
           margin-bottom: 1rem;
         }
 
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
         @media (max-width: 640px) {
-          .leads-grid {
-            grid-template-columns: 1fr;
-          }
-          .header-actions .last-refresh {
-            display: none;
-          }
+          .leads-grid { grid-template-columns: 1fr; }
+          .header-actions .last-refresh { display: none; }
         }
       `}</style>
     </div>
