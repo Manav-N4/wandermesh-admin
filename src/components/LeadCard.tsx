@@ -188,7 +188,7 @@ const LeadCard = ({ lead, onStatusChange, isNew }: LeadCardProps) => {
           align-items: baseline;
           gap: 8px;
           font-size: 13px;
-          color: #475569;
+          color: #1e293b;
         }
 
         .info-label {
@@ -243,8 +243,8 @@ const LeadCard = ({ lead, onStatusChange, isNew }: LeadCardProps) => {
 
         .section-label {
           font-size: 12px;
-          font-weight: 600;
-          color: #475569;
+          font-weight: 700;
+          color: #1e293b;
         }
 
         .expand-icon {

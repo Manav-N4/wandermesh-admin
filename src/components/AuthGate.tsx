@@ -137,11 +137,16 @@ const AuthGate = ({ onSuccess }: AuthGateProps) => {
         input {
           width: 100%;
           padding: 14px 16px;
-          border: 1px solid #e2e8f0;
+          border: 1px solid #cbd5e1;
           border-radius: 12px;
           font-size: 1rem;
-          background: #f8fafc;
+          background: white;
+          color: #1e293b;
           transition: all 0.2s;
+        }
+
+        input::placeholder {
+          color: #94a3b8;
         }
 
         input:focus {

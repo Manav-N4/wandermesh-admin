@@ -1,4 +1,3 @@
-
 import { motion } from 'framer-motion';
 
 interface StatsProps {
@@ -41,7 +40,7 @@ const StatsSection = ({ total, tripCounts }: StatsProps) => {
         <div className="stat-accent" style={{ background: '#10b981' }}></div>
         <div className="stat-info">
           <span className="stat-label">Vietnam Trips</span>
-          <span className="stat-value">{tripCounts['Vietnam'] || 0}</span>
+          <span className="stat-value">{tripCounts.Vietnam || 0}</span>
         </div>
       </motion.div>
 
@@ -49,7 +48,7 @@ const StatsSection = ({ total, tripCounts }: StatsProps) => {
         <div className="stat-accent" style={{ background: '#f59e0b' }}></div>
         <div className="stat-info">
           <span className="stat-label">Bali Trips</span>
-          <span className="stat-value">{tripCounts['Bali'] || 0}</span>
+          <span className="stat-value">{tripCounts.Bali || 0}</span>
         </div>
       </motion.div>
 
@@ -57,7 +56,7 @@ const StatsSection = ({ total, tripCounts }: StatsProps) => {
         <div className="stat-accent" style={{ background: '#8b5cf6' }}></div>
         <div className="stat-info">
           <span className="stat-label">BLR Trips</span>
-          <span className="stat-value">{tripCounts['BLR'] || tripCounts['Bangalore'] || 0}</span>
+          <span className="stat-value">{tripCounts.BLR || 0}</span>
         </div>
       </motion.div>
 
@@ -104,7 +103,7 @@ const StatsSection = ({ total, tripCounts }: StatsProps) => {
           font-size: 12px;
           text-transform: uppercase;
           letter-spacing: 0.025em;
-          font-weight: 600;
+          font-weight: 700;
           color: #94a3b8;
           margin-bottom: 4px;
         }

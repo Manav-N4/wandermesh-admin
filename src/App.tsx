@@ -85,18 +85,34 @@ function App() {
 
   const filteredLeads = useMemo(() => {
     return leads.filter(l => {
-      const matchesSearch = l.name.toLowerCase().includes(search.toLowerCase()) || 
-                           l.phone.includes(search);
-      const matchesTrip = tripFilter === 'All' || l.trip === tripFilter;
+      // Safe string conversion for search fields
+      const name = l.name?.toLowerCase() || '';
+      const phone = l.phone || '';
+      const insta = l.insta_id?.toLowerCase() || '';
+      const trip = l.trip?.toLowerCase() || '';
+      
+      const searchTerm = search.toLowerCase();
+
+      const matchesSearch = 
+        name.includes(searchTerm) || 
+        phone.includes(search) ||
+        insta.includes(searchTerm);
+      
+      const matchesTrip = tripFilter === 'All' || trip.includes(tripFilter.toLowerCase());
+      
       const matchesGender = genderFilter === 'All' || l.gender === genderFilter;
+      
       return matchesSearch && matchesTrip && matchesGender;
     });
   }, [leads, search, tripFilter, genderFilter]);
 
   const tripCounts = useMemo(() => {
-    const counts: Record<string, number> = {};
+    const counts = { Vietnam: 0, Bali: 0, BLR: 0 };
     leads.forEach(l => {
-      counts[l.trip] = (counts[l.trip] || 0) + 1;
+      const t = l.trip?.toLowerCase() || '';
+      if (t.includes('vietnam')) counts.Vietnam++;
+      else if (t.includes('bali')) counts.Bali++;
+      else if (t.includes('blr') || t.includes('bangalore')) counts.BLR++;
     });
     return counts;
   }, [leads]);

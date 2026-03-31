@@ -73,8 +73,13 @@ const FiltersBar = ({
           height: 48px;
           border-radius: 12px;
           font-size: 15px;
-          border: 1px solid #e2e8f0;
+          border: 1px solid #cbd5e1;
+          color: #1e293b;
           background: white;
+        }
+
+        .search-box input::placeholder {
+          color: #94a3b8;
         }
 
         .filters-group {
@@ -88,9 +93,9 @@ const FiltersBar = ({
           height: 48px;
           border-radius: 12px;
           font-weight: 500;
-          color: #475569;
+          color: #1e293b;
           cursor: pointer;
-          border: 1px solid #e2e8f0;
+          border: 1px solid #cbd5e1;
           background: white;
         }
 
