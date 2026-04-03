@@ -107,12 +107,13 @@ function App() {
   }, [leads, search, tripFilter, genderFilter]);
 
   const tripCounts = useMemo(() => {
-    const counts = { Vietnam: 0, Bali: 0, BLR: 0 };
+    const counts = { Vietnam: 0, Bali: 0, BLR: 0, Europe: 0 };
     leads.forEach(l => {
       const t = l.trip?.toLowerCase() || '';
       if (t.includes('vietnam')) counts.Vietnam++;
       else if (t.includes('bali')) counts.Bali++;
       else if (t.includes('blr') || t.includes('bangalore')) counts.BLR++;
+      else if (t.includes('euro')) counts.Europe++;
     });
     return counts;
   }, [leads]);

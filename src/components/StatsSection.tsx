@@ -60,6 +60,14 @@ const StatsSection = ({ total, tripCounts }: StatsProps) => {
         </div>
       </motion.div>
 
+      <motion.div variants={item} className="stat-card">
+        <div className="stat-accent" style={{ background: '#ec4899' }}></div>
+        <div className="stat-info">
+          <span className="stat-label">Europe Trips</span>
+          <span className="stat-value">{tripCounts.Europe || 0}</span>
+        </div>
+      </motion.div>
+
       <style>{`
         .stats-container {
           display: grid;
