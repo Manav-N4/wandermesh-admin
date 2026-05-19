@@ -72,7 +72,7 @@ const LeadCard = ({ lead, onStatusChange, isNew }: LeadCardProps) => {
           <div className="info-item">
             <span className="info-label">Insta:</span> 
             <a href={`https://instagram.com/${lead.insta_id}`} target="_blank" rel="noreferrer">
-              @{lead.insta_id}
+              {lead.insta_id}
             </a>
           </div>
           <div className="info-item">
