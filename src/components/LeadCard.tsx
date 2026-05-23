@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 interface LeadCardProps {
   lead: Lead;
   onStatusChange: (id: string, status: LeadStatus) => void;
+  onReject: (id: string) => void;
   isNew?: boolean;
 }
 
@@ -14,9 +15,10 @@ const statusColors: Record<LeadStatus, string> = {
   Contacted: '#f59e0b',
   Qualified: '#10b981',
   Booked: '#8b5cf6',
+  Approved: '#10b981',
 };
 
-const LeadCard = ({ lead, onStatusChange, isNew }: LeadCardProps) => {
+const LeadCard = ({ lead, onStatusChange, onReject, isNew }: LeadCardProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [copied, setCopied] = useState(false);
 
@@ -52,6 +54,7 @@ const LeadCard = ({ lead, onStatusChange, isNew }: LeadCardProps) => {
           <option value="Contacted">Contacted</option>
           <option value="Qualified">Qualified</option>
           <option value="Booked">Booked</option>
+          <option value="Approved">Approved</option>
         </select>
       </div>
 
@@ -105,6 +108,25 @@ const LeadCard = ({ lead, onStatusChange, isNew }: LeadCardProps) => {
           </AnimatePresence>
         </div>
       </div>
+
+      <AnimatePresence>
+        {lead.status !== 'Approved' && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="card-actions"
+          >
+            <button className="action-btn reject-btn" onClick={() => onReject(lead.id)}>
+              Reject
+            </button>
+            <button className="action-btn approve-btn" onClick={() => onStatusChange(lead.id, 'Approved')}>
+              Approve
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <div className="card-footer">
         <span className="timestamp">
@@ -273,6 +295,61 @@ const LeadCard = ({ lead, onStatusChange, isNew }: LeadCardProps) => {
           font-size: 11px;
           color: #94a3b8;
           font-weight: 500;
+        }
+
+        .card-actions {
+          display: flex;
+          gap: 10px;
+          margin: 0 0 1rem 0;
+          overflow: hidden;
+        }
+
+        .action-btn {
+          flex: 1;
+          padding: 8px 16px;
+          font-size: 13px;
+          font-weight: 700;
+          border-radius: 8px;
+          cursor: pointer;
+          transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+          border: 1px solid transparent;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          outline: none;
+        }
+
+        .approve-btn {
+          background: #10b981;
+          color: white;
+          box-shadow: 0 2px 4px rgba(16, 185, 129, 0.1);
+        }
+
+        .approve-btn:hover {
+          background: #059669;
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+        }
+
+        .approve-btn:active {
+          transform: translateY(0);
+        }
+
+        .reject-btn {
+          background: #fff5f5;
+          color: #ef4444;
+          border-color: #fee2e2;
+        }
+
+        .reject-btn:hover {
+          background: #fecaca;
+          color: #dc2626;
+          border-color: #fca5a5;
+          transform: translateY(-1px);
+        }
+
+        .reject-btn:active {
+          transform: translateY(0);
         }
       `}</style>
     </motion.div>

@@ -1,4 +1,4 @@
-export type LeadStatus = 'New' | 'Contacted' | 'Qualified' | 'Booked';
+export type LeadStatus = 'New' | 'Contacted' | 'Qualified' | 'Booked' | 'Approved';
 
 export interface Lead {
   id: string; // Internal UUID

@@ -49,7 +49,7 @@ function App() {
         console.error('Error fetching leads:', error);
         setError(`Supabase error: ${error.message}`);
       } else {
-        const enrichedLeads = (data || []).map((l: any) => ({
+        const enrichedLeads = ((data as Lead[] | null) || []).map((l) => ({
           ...l,
           status: l.status || 'New'
         }));
@@ -57,9 +57,9 @@ function App() {
         setError(null);
         setLastRefreshedAt(new Date());
       }
-    } catch (err: any) {
+    } catch (err) {
       console.error('Fetch error:', err);
-      setError(`Network error: ${err.message || 'Unknown error'}`);
+      setError(`Network error: ${err instanceof Error ? err.message : 'Unknown error'}`);
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -74,8 +74,46 @@ function App() {
     }
   }, [isAuthenticated, fetchLeads]);
 
-  const handleStatusChange = (id: string, status: LeadStatus) => {
+  const handleStatusChange = async (id: string, status: LeadStatus) => {
     setLeads(prev => prev.map(l => l.id === id ? { ...l, status } : l));
+    
+    try {
+      const { error } = await supabase
+        .from('leads')
+        .update({ status })
+        .eq('id', id);
+
+      if (error) {
+        console.error('Error updating status in DB:', error);
+        setError(`Failed to update status in database: ${error.message}`);
+        fetchLeads(true);
+      }
+    } catch (err) {
+      console.error('Failed to update status:', err);
+      setError(`Network error updating status: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      fetchLeads(true);
+    }
+  };
+
+  const handleReject = async (id: string) => {
+    setLeads(prev => prev.filter(l => l.id !== id));
+    
+    try {
+      const { error } = await supabase
+        .from('leads')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        console.error('Error deleting lead from DB:', error);
+        setError(`Failed to delete lead from database: ${error.message}`);
+        fetchLeads(true);
+      }
+    } catch (err) {
+      console.error('Failed to delete lead:', err);
+      setError(`Network error deleting lead: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      fetchLeads(true);
+    }
   };
 
   const handleLogout = async () => {
@@ -205,6 +243,7 @@ function App() {
                     key={lead.id} 
                     lead={lead} 
                     onStatusChange={handleStatusChange}
+                    onReject={handleReject}
                     isNew={idx === 0 && (new Date().getTime() - new Date(lead.created_at).getTime() < 600000)}
                   />
                 ))}
