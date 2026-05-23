@@ -70,6 +70,9 @@ const LeadCard = ({ lead, onStatusChange, isNew }: LeadCardProps) => {
             <span className="info-label">Gender:</span> {lead.gender}
           </div>
           <div className="info-item">
+            <span className="info-label">Age:</span> {lead.age ?? '—'}
+          </div>
+          <div className="info-item">
             <span className="info-label">Insta:</span> 
             <a href={`https://instagram.com/${lead.insta_id.startsWith('@') ? lead.insta_id.slice(1) : lead.insta_id}`} target="_blank" rel="noreferrer">
               @{lead.insta_id.startsWith('@') ? lead.insta_id.slice(1) : lead.insta_id}

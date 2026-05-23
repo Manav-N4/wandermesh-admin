@@ -4,6 +4,7 @@ export interface Lead {
   id: string; // Internal UUID
   name: string;
   gender: string;
+  age?: number | string;
   phone: string;
   insta_id: string;
   occupation: string;
@@ -12,3 +13,4 @@ export interface Lead {
   created_at: string;
   status: LeadStatus; // Frontend only state initially
 }
+
