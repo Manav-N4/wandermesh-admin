@@ -75,44 +75,56 @@ function App() {
   }, [isAuthenticated, fetchLeads]);
 
   const handleStatusChange = async (id: string, status: LeadStatus) => {
+    const originalLeads = leads;
     setLeads(prev => prev.map(l => l.id === id ? { ...l, status } : l));
     
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('leads')
         .update({ status })
-        .eq('id', id);
+        .eq('id', id)
+        .select();
 
       if (error) {
         console.error('Error updating status in DB:', error);
         setError(`Failed to update status in database: ${error.message}`);
-        fetchLeads(true);
+        setLeads(originalLeads);
+      } else if (!data || data.length === 0) {
+        console.error('No rows updated. Check Row Level Security (RLS) policies on public.leads.');
+        setError('Failed to update status: Permission denied (RLS policy block).');
+        setLeads(originalLeads);
       }
     } catch (err) {
       console.error('Failed to update status:', err);
       setError(`Network error updating status: ${err instanceof Error ? err.message : 'Unknown error'}`);
-      fetchLeads(true);
+      setLeads(originalLeads);
     }
   };
 
   const handleReject = async (id: string) => {
+    const originalLeads = leads;
     setLeads(prev => prev.filter(l => l.id !== id));
     
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('leads')
         .delete()
-        .eq('id', id);
+        .eq('id', id)
+        .select();
 
       if (error) {
         console.error('Error deleting lead from DB:', error);
         setError(`Failed to delete lead from database: ${error.message}`);
-        fetchLeads(true);
+        setLeads(originalLeads);
+      } else if (!data || data.length === 0) {
+        console.error('No rows deleted. Check Row Level Security (RLS) policies on public.leads.');
+        setError('Failed to delete lead: Permission denied (RLS policy block).');
+        setLeads(originalLeads);
       }
     } catch (err) {
       console.error('Failed to delete lead:', err);
       setError(`Network error deleting lead: ${err instanceof Error ? err.message : 'Unknown error'}`);
-      fetchLeads(true);
+      setLeads(originalLeads);
     }
   };
 
