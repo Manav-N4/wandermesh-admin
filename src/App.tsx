@@ -13,12 +13,12 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   // Filters state
   const [search, setSearch] = useState('');
   const [tripFilter, setTripFilter] = useState('All');
   const [genderFilter, setGenderFilter] = useState('All');
-  
+
   // Tracking new lead
   const [lastRefreshedAt, setLastRefreshedAt] = useState<Date>(new Date());
 
@@ -38,7 +38,7 @@ function App() {
   const fetchLeads = useCallback(async (isAuto = false) => {
     if (!isAuto) setLoading(true);
     setRefreshing(true);
-    
+
     try {
       const { data, error } = await supabase
         .from('leads')
@@ -77,7 +77,7 @@ function App() {
   const handleStatusChange = async (id: string, status: LeadStatus) => {
     const originalLeads = leads;
     setLeads(prev => prev.map(l => l.id === id ? { ...l, status } : l));
-    
+
     try {
       const { data, error } = await supabase
         .from('leads')
@@ -104,7 +104,7 @@ function App() {
   const handleReject = async (id: string) => {
     const originalLeads = leads;
     setLeads(prev => prev.filter(l => l.id !== id));
-    
+
     try {
       const { data, error } = await supabase
         .from('leads')
@@ -140,30 +140,42 @@ function App() {
       const phone = l.phone || '';
       const insta = l.insta_id?.toLowerCase() || '';
       const trip = l.trip?.toLowerCase() || '';
-      
+
       const searchTerm = search.toLowerCase();
 
-      const matchesSearch = 
-        name.includes(searchTerm) || 
+      const matchesSearch =
+        name.includes(searchTerm) ||
         phone.includes(search) ||
         insta.includes(searchTerm);
-      
-      const matchesTrip = tripFilter === 'All' || trip.includes(tripFilter.toLowerCase());
-      
+
+      let mappedTrip = 'Other';
+      if (trip.includes('vietnam')) mappedTrip = 'Vietnam';
+      else if (trip.includes('bali')) mappedTrip = 'Bali';
+      else if (trip.includes('sakleshpur')) mappedTrip = 'Sakleshpur';
+      else if (trip.includes('blr') || trip.includes('bangalore')) mappedTrip = 'BLR';
+      else if (trip.includes('euro')) mappedTrip = 'Europe';
+      else if (trip.includes('lanka')) mappedTrip = 'Sri Lanka';
+      else if (trip.includes('thailand') || trip.includes('full moon')) mappedTrip = 'Thailand';
+
+      const matchesTrip = tripFilter === 'All' || mappedTrip === tripFilter;
+
       const matchesGender = genderFilter === 'All' || l.gender === genderFilter;
-      
+
       return matchesSearch && matchesTrip && matchesGender;
     });
   }, [leads, search, tripFilter, genderFilter]);
 
   const tripCounts = useMemo(() => {
-    const counts = { Vietnam: 0, Bali: 0, BLR: 0, Europe: 0 };
+    const counts: Record<string, number> = { Vietnam: 0, Bali: 0, Sakleshpur: 0, BLR: 0, Europe: 0, 'Sri Lanka': 0, Thailand: 0 };
     leads.forEach(l => {
       const t = l.trip?.toLowerCase() || '';
       if (t.includes('vietnam')) counts.Vietnam++;
       else if (t.includes('bali')) counts.Bali++;
+      else if (t.includes('sakleshpur')) counts.Sakleshpur++;
       else if (t.includes('blr') || t.includes('bangalore')) counts.BLR++;
       else if (t.includes('euro')) counts.Europe++;
+      else if (t.includes('lanka')) counts['Sri Lanka']++;
+      else if (t.includes('thailand') || t.includes('full moon')) counts.Thailand++;
     });
     return counts;
   }, [leads]);
@@ -227,7 +239,7 @@ function App() {
         </section>
 
         <section className="listing-section">
-          <FiltersBar 
+          <FiltersBar
             search={search} setSearch={setSearch}
             tripFilter={tripFilter} setTripFilter={setTripFilter}
             genderFilter={genderFilter} setGenderFilter={setGenderFilter}
@@ -251,9 +263,9 @@ function App() {
             <div className="leads-grid">
               <AnimatePresence mode="popLayout">
                 {filteredLeads.map((lead, idx) => (
-                  <LeadCard 
-                    key={lead.id} 
-                    lead={lead} 
+                  <LeadCard
+                    key={lead.id}
+                    lead={lead}
                     onStatusChange={handleStatusChange}
                     onReject={handleReject}
                     isNew={idx === 0 && (new Date().getTime() - new Date(lead.created_at).getTime() < 600000)}

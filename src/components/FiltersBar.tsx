@@ -31,8 +31,11 @@ const FiltersBar = ({
             <option value="All">All Trips</option>
             <option value="Vietnam">Vietnam</option>
             <option value="Bali">Bali</option>
+            <option value="Sakleshpur">Sakleshpur</option>
             <option value="BLR">BLR</option>
-            <option value="Euro">Europe</option>
+            <option value="Europe">Europe</option>
+            <option value="Sri Lanka">Sri Lanka</option>
+            <option value="Thailand">Thailand</option>
           </select>
         </div>
 

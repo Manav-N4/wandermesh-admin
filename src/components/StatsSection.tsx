@@ -36,37 +36,23 @@ const StatsSection = ({ total, tripCounts }: StatsProps) => {
         </div>
       </motion.div>
 
-      <motion.div variants={item} className="stat-card">
-        <div className="stat-accent" style={{ background: '#10b981' }}></div>
-        <div className="stat-info">
-          <span className="stat-label">Vietnam Trips</span>
-          <span className="stat-value">{tripCounts.Vietnam || 0}</span>
-        </div>
-      </motion.div>
-
-      <motion.div variants={item} className="stat-card">
-        <div className="stat-accent" style={{ background: '#f59e0b' }}></div>
-        <div className="stat-info">
-          <span className="stat-label">Bali Trips</span>
-          <span className="stat-value">{tripCounts.Bali || 0}</span>
-        </div>
-      </motion.div>
-
-      <motion.div variants={item} className="stat-card">
-        <div className="stat-accent" style={{ background: '#8b5cf6' }}></div>
-        <div className="stat-info">
-          <span className="stat-label">BLR Trips</span>
-          <span className="stat-value">{tripCounts.BLR || 0}</span>
-        </div>
-      </motion.div>
-
-      <motion.div variants={item} className="stat-card">
-        <div className="stat-accent" style={{ background: '#ec4899' }}></div>
-        <div className="stat-info">
-          <span className="stat-label">Europe Trips</span>
-          <span className="stat-value">{tripCounts.Europe || 0}</span>
-        </div>
-      </motion.div>
+      {[
+        { key: 'Vietnam', name: 'Vietnam', color: '#10b981' },
+        { key: 'Bali', name: 'Bali', color: '#f59e0b' },
+        { key: 'Europe', name: 'Europe', color: '#ec4899' },
+        { key: 'Sakleshpur', name: 'Sakleshpur', color: '#8b5cf6' },
+        { key: 'BLR', name: 'BLR', color: '#6366f1' },
+        { key: 'Sri Lanka', name: 'Sri Lanka', color: '#0ea5e9' },
+        { key: 'Thailand', name: 'Thailand', color: '#f43f5e' },
+      ].map((trip) => (
+        <motion.div key={trip.key} variants={item} className="stat-card">
+          <div className="stat-accent" style={{ background: trip.color }}></div>
+          <div className="stat-info">
+            <span className="stat-label">{trip.name} Trips</span>
+            <span className="stat-value">{tripCounts[trip.key] || 0}</span>
+          </div>
+        </motion.div>
+      ))}
 
       <style>{`
         .stats-container {
